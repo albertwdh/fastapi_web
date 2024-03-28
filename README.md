@@ -8,6 +8,7 @@ uvicorn app.main:app --reload
 ```
 
 ## 路由
+使用APIRouter
 
 
 
