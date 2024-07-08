@@ -4,6 +4,7 @@
 @author:wdh
 @time:2024-06-25
 """
+
 from passlib.context import CryptContext
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
@@ -25,12 +26,15 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     username: Optional[str] = None
 
+# 验证密码
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
+# 获取密码哈希
 def get_password_hash(password):
     return pwd_context.hash(password)
 
+# 创建访问令牌
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
     if expires_delta:

@@ -6,7 +6,6 @@
 """
 
 
-
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from sqlalchemy.orm import Session
 
@@ -16,6 +15,7 @@ from app.db import get_db
 
 router = APIRouter()
 
+# 上传算法文件并创建算法
 @router.post("/algorithms/", response_model=schemas.Algorithm)
 async def create_algorithm(name: str, description: str, file: UploadFile = File(...), db: Session = Depends(get_db)):
     user_id = 1  # 这里需要获取当前登录用户的 ID
