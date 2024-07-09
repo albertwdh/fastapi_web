@@ -19,4 +19,4 @@ class Algorithm(Base):
     file_path = Column(String(250))  # 文件路径
     user_id = Column(Integer, ForeignKey("users.id"))  # 外键，关联用户
 
-    owner = relationship("User", back_populates="algorithms")  # 关系定义
+    owner = relationship("User", back_populates="algorithms")

@@ -5,10 +5,10 @@
 @time:2024-06-25
 """
 
-
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+
 
 from app.config import settings
 

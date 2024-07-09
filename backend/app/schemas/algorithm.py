@@ -21,7 +21,6 @@ class AlgorithmCreate(AlgorithmBase):
 # 算法模型
 class Algorithm(AlgorithmBase):
     id: int
-    owner_id: int
 
     class Config:
         orm_mode = True  # 使 Pydantic 与 ORM 模型兼容

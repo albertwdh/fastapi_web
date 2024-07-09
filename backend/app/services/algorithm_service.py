@@ -6,24 +6,21 @@
 """
 
 from sqlalchemy.orm import Session
-from app.models import algorithm as models
-from app.schemas import algorithm as schemas
-from app.tasks import run_algorithm
-
-# 获取算法
+from app.models.algorithm import Algorithm
+from app.schemas.algorithm import AlgorithmCreate
+import logging
 def get_algorithm(db: Session, algorithm_id: int):
-    return db.query(models.Algorithm).filter(models.Algorithm.id == algorithm_id).first()
+    return db.query(Algorithm).filter(Algorithm.id == algorithm_id).first()
 
-# 获取所有算法
 def get_algorithms(db: Session, skip: int = 0, limit: int = 10):
-    return db.query(models.Algorithm).offset(skip).limit(limit).all()
+    return db.query(Algorithm).offset(skip).limit(limit).all()
 
-# 创建算法
-def create_algorithm(db: Session, algorithm: schemas.AlgorithmCreate, user_id: int):
-    db_algorithm = models.Algorithm(**algorithm.dict(), owner_id=user_id)
+def create_algorithm(db: Session, algorithm: AlgorithmCreate, user_id: int, file_path: str):
+    logging.info(
+        f"Creating algorithm with name={algorithm.name}, description={algorithm.description}, file_path={file_path}, user_id={user_id}")
+    db_algorithm = Algorithm(**algorithm.dict(), user_id=user_id, file_path=file_path)
     db.add(db_algorithm)
     db.commit()
     db.refresh(db_algorithm)
-    # 运行定时任务
-    run_algorithm.delay(db_algorithm.id)
+    logging.info(f"Created algorithm with id={db_algorithm.id}")
     return db_algorithm

@@ -7,20 +7,48 @@
 
 
 import os
+from pydantic import BaseSettings
 
-class Settings:
+class BaseConfig(BaseSettings):
+
     PROJECT_NAME: str = "Algorithm Platform"
     PROJECT_VERSION: str = "1.0.0"
+    SECRET_KEY: str = "albertwangdh@sina.com"
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
-    MYSQL_USER: str = os.getenv("MYSQL_USER", "root")
-    MYSQL_PASSWORD: str = os.getenv("MYSQL_PASSWORD", "password")
-    MYSQL_DB: str = os.getenv("MYSQL_DB", "algorithms")
-    MYSQL_HOST: str = os.getenv("MYSQL_HOST", "mysql")
-    MYSQL_PORT: str = os.getenv("MYSQL_PORT", "3306")
+    # MySQL 配置
+    MYSQL_USER: str = "root"
+    MYSQL_PASSWORD: str = "pwd"
+    MYSQL_DB: str = "algorithms"
+    MYSQL_HOST: str = "mysql"
+    MYSQL_PORT: str = "3306"
 
-    MONGO_DB: str = os.getenv("MONGO_DB", "algorithm_mongo")
-    MONGO_HOST: str = os.getenv("MONGO_HOST", "mongodb://mongo:27017")
 
-    SECRET_KEY: str = os.getenv("SECRET_KEY", "secret")
+    # MongoDB 配置
+    MONGO_DB: str = "algorithm_mongo"
+    MONGO_HOST: str = "mongodb://mongo:27017"
 
-settings = Settings()
+    # RabbitMQ 配置
+    RABBITMQ_USER: str = "guest"
+    RABBITMQ_PASSWORD: str = "guest"
+    RABBITMQ_HOST: str = "rabbitmq"
+    RABBITMQ_PORT: int = 5672
+
+    class Config:
+        env_file = ".env"
+        env_file_encoding = 'utf-8'
+
+class DevelopmentConfig(BaseConfig):
+    DEBUG: bool = True
+
+class ProductionConfig(BaseConfig):
+    DEBUG: bool = False
+
+def get_settings():
+    env = os.getenv("ENV", "development")
+    if env == "production":
+        return ProductionConfig()
+    return DevelopmentConfig()
+
+settings = get_settings()
