@@ -17,8 +17,8 @@ celery_app = Celery(
     "worker",
     broker="redis://localhost:6379/0",
     backend="redis://localhost:6379/0",
-    include=['task.test']
+    include=['test']
 )
 
 
-# celery -A celery_app worker --loglevel=info --pool=solo
+# backend        celery -A app.celery_app worker --loglevel=info --pool=solo

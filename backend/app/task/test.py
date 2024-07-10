@@ -5,7 +5,7 @@
 @time:2024-07-05
 """
 
-from celery_app import celery_app
+from app.celery_app import celery_app
 import time
 @celery_app.task
 def long_task():

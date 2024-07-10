@@ -13,7 +13,7 @@ from app.config import settings
 from app.schemas.user import UserCreate, User
 from app.services.user_service import get_user_by_username, get_user_by_email, create_user, authenticate_user, create_token_for_user
 from app.db import get_db
-from mail import send_email
+from app.mail import send_email
 
 router = APIRouter()
 
