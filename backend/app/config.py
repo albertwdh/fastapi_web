@@ -7,7 +7,7 @@
 
 
 import os
-from pydantic import BaseSettings
+from pydantic import BaseSettings, EmailStr
 
 class BaseConfig(BaseSettings):
 
@@ -34,6 +34,19 @@ class BaseConfig(BaseSettings):
     RABBITMQ_PASSWORD: str = "guest"
     RABBITMQ_HOST: str = "rabbitmq"
     RABBITMQ_PORT: int = 5672
+
+    # 邮件
+    MAIL_USERNAME: str
+    MAIL_PASSWORD: str
+    MAIL_FROM: EmailStr
+    MAIL_PORT: int
+    MAIL_SERVER: str
+    MAIL_FROM_NAME: str
+    MAIL_TLS: bool = True
+    MAIL_SSL: bool = False
+
+    MAIL_RECEIVE: str
+
 
     class Config:
         env_file = ".env"
