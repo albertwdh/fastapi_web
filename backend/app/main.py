@@ -12,11 +12,13 @@ from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from app.utils.auth import get_current_user
 
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 from app.routers import user, algorithm, public
-from app.init_db import init_db  # 导入初始化数据库脚本
+from app.task.test import long_task, get_task_result
+
 app = FastAPI()
 
 # 设置 CORS 中间件，允许跨域请求
@@ -41,7 +43,25 @@ app.include_router(algorithm.router, prefix="/algorithm", tags=["Algorithm"], de
 #     init_db()
 
 
+
+@app.get("/celery_test")
+def celery_test():
+    task = long_task.delay()
+    return {"task_id": task.id, "status": task.status}
+
+
+
+@app.get("/task/{task_id}")
+def get_task_status(task_id: str):
+    return get_task_result(task_id)
+
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
 
+
+
+# 命令行启动
+# uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
