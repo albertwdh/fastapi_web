@@ -14,6 +14,8 @@ from app.schemas.user import UserCreate, User
 from app.services.user_service import get_user_by_username, get_user_by_email, create_user, authenticate_user, create_token_for_user
 from app.db import get_db
 from app.mail import send_email
+from app.celery_app import celery_app
+from app.task.celery_task import to_mail, to_mail_result
 
 router = APIRouter()
 
@@ -31,8 +33,8 @@ class EmailSchema(BaseModel):
     subject: str
     body: str
 
-@router.post("/send-email/")
-def send_email_endpoint(
+@router.post("/send_email_background")
+def send_email_background(
     email: EmailSchema,
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db)
@@ -40,15 +42,17 @@ def send_email_endpoint(
     background_tasks.add_task(send_email, email.subject, email.email_to, email.body)
     return JSONResponse(status_code=200, content={"message": "Email has been sent"})
 
-
-@router.post("/auto-send-email/")
+@router.post("/send-email")
 def auto_send_email_endpoint(
-    email: EmailSchema,
-    background_tasks: BackgroundTasks,
-    db: Session = Depends(get_db)
+    email: EmailSchema
 ):
-    background_tasks.add_task(send_email, email.subject, email.email_to, email.body)
-    return JSONResponse(status_code=200, content={"message": "Email has been sent"})
+    result = to_mail.delay(email.subject, email.email_to, email.body)
+    return JSONResponse(status_code=200, content={"task_id": result.id, "status": result.status})
+
+@router.post("/get-email-result/{task_id}")
+def get_task_result(task_id):
+    result = to_mail_result(task_id)
+    return JSONResponse(status_code=200, content=result)
 
 
 
