@@ -8,7 +8,6 @@ from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, EmailStr, Field
-from fastapi.security import OAuth2PasswordRequestForm
 from app.config import settings
 from app.schemas.user import UserCreate, User
 from app.services.user_service import get_user_by_username, get_user_by_email, create_user, authenticate_user, create_token_for_user
@@ -18,14 +17,6 @@ from app.celery_app import celery_app
 from app.task.celery_task import to_mail, to_mail_result
 
 router = APIRouter()
-
-@router.get("/health")
-def health_check():
-    return {"status": "ok"}
-
-@router.get("/")
-def root():
-    return {"message": "Hello World"}
 
 
 class EmailSchema(BaseModel):
@@ -66,14 +57,3 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Email already registered")
     return create_user(db, user)
 
-@router.post("/token", response_model=dict)
-def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    user = authenticate_user(db, form_data.username, form_data.password)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    access_token = create_token_for_user(user)
-    return {"access_token": access_token, "token_type": "bearer"}
